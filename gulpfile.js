@@ -33,11 +33,8 @@ gulp.task('scss', function () {
             //        transform: rotate(45deg);
             remove: true //是否去掉不必要的前缀 默认：true
         }))
-        .pipe(gulp.dest('./example/css'))
-        .pipe(gulp.dest('./dist/css'))
         .pipe(sourcemaps.write('./maps'))
-        .pipe(minifyCss())
-        .pipe(gulp.dest('./dist/css'))
+        .pipe(gulp.dest('./example/css'))
         .pipe(browserSync.stream());
 });
 gulp.task('watch', function () {
@@ -82,5 +79,32 @@ gulp.task('jsmin',function () {
         }))
         .pipe(gulp.dest('./dist/js/'));
 });
+//css文件压缩
+gulp.task('cssmin',function () {
+    gulp.src('./example/scss/*.scss')
+        .pipe(sass.sync({outputStyle: 'expanded'}).on('error', sass.logError))
+        .pipe(autoprefixer({
+            browsers: [
+                'last 2 version',
+                'Firefox >= 20',
+                'safari 5',
+                'ie 8',
+                'ie 9',
+                'opera 12.1',
+                'iOS 7',
+                '> 5%',
+                'ios 6',
+                'android 4'
+            ],
+            cascade: true, //是否美化属性值 默认：true 像这样：
+            //-webkit-transform: rotate(45deg);
+            //        transform: rotate(45deg);
+            remove: true //是否去掉不必要的前缀 默认：true
+        }))
+        .pipe(gulp.dest('./dist/css'))
+        .pipe(minifyCss())
+        .pipe(gulp.dest('./dist/css'))
+});
 
-gulp.task('dist',['jsmin','scss']);
+
+gulp.task('dist',['jsmin','cssmin']);

@@ -17,9 +17,6 @@
         this.isPlay = function () {
             return !self.$video[0].paused
         }
-        this.isLoop = function () {
-            return !!self.$video.attr('loop')
-        }
     }
     PopVideo.VERSION = "0.0.3";
     PopVideo.DEFAULTS = {
@@ -74,11 +71,10 @@
         //TODO 自定义控制界面
         var tpl = '<div class="popvideo-wrapper" id="' + popid + '">' +
             '<div class="popvideo">' +
-            '<div class="popvideo-head">' +
-            '<a href="javascript:void(0)" class="popvideo-close">&times;</a><h3 class="popvideo-title">' + this.options.title + '</h3>' +
-            '</div>' +
-            '<div class="popvideo-content">' + '<video controls '+loop+'></video>' +
-            '</div></div></div>';
+            '<div class="popvideo-head"><a href="javascript:void(0)" class="popvideo-close">&times;</a><h4 class="popvideo-title">' + this.options.title + '</h4></div>' +
+            '<div class="popvideo-content">' + '<video controls '+loop+'></video></div>' +
+            '<div class="popvideo-controls"></div>'+
+            '</div></div>';
         $('body').append(tpl);
         this.$wrapper = $('#' + popid);
         this.$video = this.$wrapper.find('video');
