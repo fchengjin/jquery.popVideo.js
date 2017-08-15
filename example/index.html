@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>test</title>
+    <style>
+html,body{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+    </style>
+    <link rel="stylesheet" href="css/jquery.PopVideo.css">
+</head>
+<body>
+<video src="http://113.96.35.214/vhot2.qqvideo.tc.qq.com/AUqKd5Mp5pbly2Ql4yZdhzA6yDFPaH5ZrAB9DPHr3Euo/h0532bwuusg.p712.1.mp4?sdtfrom=v1010&guid=378e182457d5afc70b22cd4be786dee2&vkey=A6977CAF33A1CDDCCE47B0790F509551C3C42EE4388ECEFA9DEABD35FE13F7E36A63A6A6D0B7B59B262D191A7C04CCD5965544FC02DC8D30334FDA6994D13856884BF9DFCB421C1D2858503B45C5FDE743C11A72CCC1D6BFC39DEE9C32063BEF510E78D7B8B09A2E55BC7D3C07BE773B800999A8A89C2058&platform=2&locid=5aacc6e5-d621-4523-869e-5f89a5cd45ff&size=15055218&ocid=1325405356" loop muted autoplay id="video" class="video" style="width: 300px"></video>
+<div style="width: 100%; height: 3000px"></div>
+<script src="js/jquery-3.1.1.js"></script>
+<script src="js/jquery.PopVideo.js"></script>
+<script>
+    $('#video').click(function () {
+        $('#video').popVideo({
+            playOnOpen: true,
+            title: "这是一个视频啦啦啦啦",
+            closeOnEnd: true,
+            pauseOnClose: true,
+            video:'http://113.105.167.26/vhot2.qqvideo.tc.qq.com/AcYiihNbmfachEUwBbCWBQiw3IMcvkSAK849fYuTE-9w/i0532vr8ger.mp4?sdtfrom=v1010&guid=378e182457d5afc70b22cd4be786dee2&vkey=813F2834556375FBCB415222140914534B6AFE7446AC1DC90F8F064A4734D11A0A5861C68ABAB14CE96B9AD3C7854FB879BC8C7164019F5ABC175799703C504C383723555C353D64A563C53170D525D8B3F28C49887892714D910677E07692CCCEC56EA5B0DC9D612A40A0AC728D94810A72799FD5E94644&platform=2'
+        }).open()
+    });
+</script>
+</body>
+</html>
