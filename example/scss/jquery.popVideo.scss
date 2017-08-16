@@ -46,6 +46,8 @@
 .popvideo-head{
     top: -40px;
     left: 0;
+    padding-left: 15px;
+    padding-right: 50px;
     transition: top .3s ease;
 }
 .popvideo-close{
@@ -55,6 +57,8 @@
     text-decoration: none;
     color: white;
     height: 40px;
+    width: 40px;
+    text-align: center;
     line-height: 40px;
     font-size: 24px;
     transition: color .3s ease;
@@ -193,7 +197,6 @@
     flex-direction: row;
 }
 .popvideo_left_controls{
-    margin-left: 8px;
     .popvideo_btn{
         width: 36px;
         margin-left: 4px;
@@ -221,19 +224,14 @@
     visibility: hidden;
     opacity: 0;
 }
-.popvideo_btn_play[data-status=pause] .popvideo_svg_pause, .popvideo_btn_play[data-status=play] .popvideo_svg_play, .popvideo_btn_play[data-status=replay] .popvideo_svg_replay, .popvideo_btn_play[data-status=stop] .popvideo_svg_stop {
+.popvideo_btn_play[data-status=pause] .popvideo_svg_pause, .popvideo_btn_play[data-status=play] .popvideo_svg_play, .popvideo_btn_play[data-status=replay] .popvideo_svg_replay{
     visibility: visible;
     opacity: 1;
-    animation: popvideo_btn_rotate .3s ease both;
-    animation: none;
 }
-.popvideo_btn_play[data-status=play] .popvideo_svg_play {
-    animation: popvideo_btn_rotate_2 .3s ease both;
-    animation: none;
-}
+
 .popvideo_time_display {
     height: 100%;
-    margin-left: 20px;
+    margin-left: 0;
     white-space: nowrap;
     font-size: 0;
     flex: none;
@@ -286,6 +284,28 @@
 .popvideo_btn_fake[data-status=false] .popvideo_svg_fake, .popvideo_btn_fake[data-status=true] .popvideo_svg_fake_true, .popvideo_btn_fullscreen[data-status=false] .popvideo_svg_fullscreen, .popvideo_btn_fullscreen[data-status=true] .popvideo_svg_fullscreen_true, .popvideo_btn_size[data-status=false] .popvideo_svg_size, .popvideo_btn_size[data-status=true] .popvideo_svg_size_true {
     display: block;
 }
+.popvideo_volume_range{
+    width: 100px;
+    margin-left: 7px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 2px;
+    position: relative;
+}
+.popvideo_volume_range_current{
+    background-color: #ff6e0b;
+    height: 100%;
+    border-radius: 2px;
+}
+.popvideo_volume_handle{
+    width: 10px;
+    height: 10px;
+    background: white;
+    position: absolute;
+    border-radius: 5px;
+    top: -3px;
+    margin-left: -5px;
+}
 @keyframes popvideo_btn_rotate {
     0% {
         transform: rotate(90deg) translateZ(0);
@@ -307,4 +327,13 @@
         transform: rotate(0) translateZ(0);
         transform-origin: center center
     }
+}
+
+
+//以下删除
+.popvideo-head{
+    top: 0;
+}
+.popvideo-control-wrap{
+    bottom: 0;
 }
