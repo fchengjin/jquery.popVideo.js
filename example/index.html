@@ -16,9 +16,13 @@
     </style>
     <link rel="stylesheet" href="css/jquery.popVideo.css">
 </head>
-<body style="overflow: hidden">
-<video src="https://c1.mifile.cn/f/i/17/mi6/index/video-footer.mp4"
-       loop muted autoplay id="video" class="video" style="width: 300px"></video>
+<body>
+<!--https://c1.mifile.cn/f/i/17/mi6/index/video-footer.mp4-->
+<video src="/media/video.mp4"
+       loop muted autoplay id="video" class="video" style="width: 300px">
+    <source src="/media/video.mp4" type="video/mp4">
+</video>
+<div style="height: 3000px"></div>
 <script src="js/jquery-3.1.1.js"></script>
 <script src="js/jquery.popVideo.js"></script>
 <script>
@@ -26,7 +30,7 @@
         $('#video').popVideo({
             playOnOpen: true,
             title: "这是一个视频啦啦啦啦",
-            closeOnEnd: true,
+//            closeOnEnd: true,
             pauseOnClose: true,
             video: "media/popvideo.mp4"
         }).open()

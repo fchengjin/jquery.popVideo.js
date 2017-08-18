@@ -8,6 +8,7 @@
     font-size: 14px;
     align-items: center;
     justify-content: center;
+    box-sizing: border-box;
 }
 .popvideo-wrapper *{
     margin: 0;
@@ -146,7 +147,6 @@
     left: 0;
     top: 0;
     height: 100%;
-    width: 2px;
     background-color: #ff6e0b;
     transform: translateZ(0);
 }
@@ -328,7 +328,10 @@
         transform-origin: center center
     }
 }
-
+进度条动画控制
+.popvideo_progress_load,.popvideo_progress_play,.popvideo_btn_scrubber{
+    transition: all .1s ease;
+}
 
 //以下删除
 .popvideo-head{

@@ -9,16 +9,14 @@
         this.$element = $(element)
         this.popid = null
         this.$wrapper = null
+        this.$control = null
         this.$playbtn = null
         this.video = null
         this.$video = null
+        this.isOpen = null
+        this.isPlay = null
         var self = this
-        this.isOpen = false
         this.init(element, options)
-        this.duration = this.$video[0].duration
-        this.isPlay = (function () {
-            return !self.$video[0].paused
-        })()
     }
     PopVideo.VERSION = "0.0.3";
     PopVideo.DEFAULTS = {
@@ -31,20 +29,19 @@
         video: '',//(String || Array)
         duration: 300,
         callback: {
-            // TODO 回调的插入位置
             onOpen: function () {
                 //窗口打开时
             },
             onClose: function () {
                 //窗口关闭时
             },
-            onPlay: function () {
+            onPlay: function (self) {
                 //视频播放时
             },
-            onPause: function () {
+            onPause: function (self) {
                 //视频暂停
             },
-            onEnd: function (event,self) {
+            onEnd: function (self) {
                 //视频播放完毕
             }
         }
@@ -64,7 +61,7 @@
         } else {
             this.video = video;
         }
-        var loop = this.options.loop ? 'loop': '';
+        var loop = this.options.loop ? 'loop' : '';
         //生成一个随机5位数，作为id
         var popid = 'popid-'
         do popid += ~~(Math.random() * 100000)
@@ -97,14 +94,10 @@
             "        <div data-role=\"popvideo-control-wrap\" class=\"popvideo-control-wrap\">\n" +
             "            <div class=\"popvideo_progress_bar_container\" data-role=\"popvideo-control-progress\">\n" +
             "                <div class=\"popvideo_progress_list\" data-role=\"popvideo-control-progress-list\">\n" +
-            "                    <div class=\"popvideo_progress_load\" style=\"width: 60%\"\n" +
-            "                         data-role=\"popvideo-control-load-progress\"></div>\n" +
-            "                    <div class=\"popvideo_progress_play\" style=\"width: 30%\"\n" +
-            "                         data-role=\"popvideo-control-play-progress\"></div>\n" +
+            "                    <div class=\"popvideo_progress_load\"></div>\n" +
+            "                    <div class=\"popvideo_progress_play\"></div>\n" +
             "                </div>\n" +
-            "                <div class=\"popvideo_btn_scrubber\" style=\"left:30%\" data-role=\"popvideo-control-play-point\">\n" +
-            "                    <div class=\"popvideo_scrubber_indicator\" data-role=\"popvideo-control-progress-indicator\"></div>\n" +
-            "                </div>\n" +
+            "                <div class=\"popvideo_btn_scrubber\"><div class=\"popvideo_scrubber_indicator\"></div></div>" +
             "            </div>\n" +
             "            <div class=\"popvideo_controls\">\n" +
             "                <div class=\"popvideo_left_controls\" data-role=\"popvideo-control-left\">\n" +
@@ -123,9 +116,9 @@
             "                        </svg>\n" +
             "                    </div>\n" +
             "                    <div data-role=\"popvideo-control-time-mod\" class=\"popvideo_time_display\">\n" +
-            "                        <div class=\"popvideo_time_current\" data-role=\"popvideo-control-currenttime\">00:00</div>\n" +
+            "                        <div class=\"popvideo_time_current\" >00:00</div>\n" +
             "                        <div class=\"popvideo_time_separator\">/</div>\n" +
-            "                        <div class=\"popvideo_time_duration\" data-role=\"popvideo-control-duration\">01:48</div>\n" +
+            "                        <div class=\"popvideo_time_duration\" >00:00</div>\n" +
             "                    </div>\n" +
             "                </div>\n" +
             "                <div class=\"popvideo_right_controls\" data-role=\"popvideo-control-right\">\n" +
@@ -169,39 +162,71 @@
             '</div></div>';
         $('body').append(tpl);
         this.$wrapper = $('#' + popid);
-        this.$playbtn = this.$wrapper.find('.popvideo_btn_play');
         this.$video = this.$wrapper.find('video');
+        this.$playbtn = this.$wrapper.find('.popvideo_btn_play');
+        this.$control = this.$wrapper.find('.popvideo-control-wrap');
         this.setVideo(video);
         // 为x添加close事件
         var self = this;
-        this.$wrapper.find('.popvideo-close').on('click.popvideo.close',function () {
-            self.close();
-        });
-        //视频播放完毕事件
-        this.$video.on('ended.popvideo',function (e) {
-            self.options.callback.onEnd(e,self);
-            if(self.options.closeOnEnd){
+        this.$wrapper.click(function (e) {
+            if(e.target === this){
                 self.close();
             }
         });
-        //todo 空格键控制视频播放
+        this.$wrapper.find('.popvideo-close').on('click.popvideo.close', function () {
+            self.close();
+        });
+        //视频播放完毕事件
+        this.$video.on('ended.popvideo', function (e) {
+            self.options.callback.onEnd(self);
+            self.pause();
+            if (self.options.closeOnEnd) {
+                self.close();
+            }
+        });
+        // 视频播放时间改变时
+        this.$video.on('timeupdate',function () {
+            self.$control.find('.popvideo_time_current').html(formatTime(self.getCurrentTime()));
+            // 更新进度条
+            var percentage = self.getCurrentTime() / self.duration * 100 + "%";
+            self.$control.find('.popvideo_progress_play').css('width', percentage);
+            self.$control.find('.popvideo_btn_scrubber').css('left', percentage);
+        });
+        //当元数据（比如分辨率和时长）被加载时运行的脚本。
+        this.$video.on('loadedmetadata',function (e) {
+            var duration = self.duration = this.duration;
+           self.$control.find('.popvideo_time_duration').html(formatTime(duration));
+        });
         //播放按钮事件
-        this.$playbtn.on('click.popvideo.play',function () {
+        this.$playbtn.on('click.popvideo.play', function () {
             var $playbtn = $(this);
-            switch ($playbtn.attr('data-status')){
+            switch ($playbtn.attr('data-status')) {
                 case 'play':
                     self.play();
                     break;
                 case 'pause':
                     self.pause();
                     break;
-                case 'replay':
-                    self.replay();
-                    break;
                 default:
                     self.play();
                     break;
             }
+        })
+        //空格控制播放
+        $(window).on('keyup.space',function (e) {
+           if(e.keyCode === 32 && self.isOpen){
+               if(self.isPlay){
+                   self.pause();
+               }else{
+                   self.play();
+               }
+           }
+        });
+        //进度条点击事件
+        this.$control.find('.popvideo_progress_bar_container').on('click.progress',function (e) {
+            e.preventDefault();
+            var p = parseInt(self.duration * e.offsetX / $(this).width());
+            self.setCurrentTime(p);
         })
     };
     PopVideo.prototype.open = function () {
@@ -213,9 +238,9 @@
             this.play();
         }
         var self = this;
-        if(this.options.closeKey){
+        if (this.options.closeKey) {
             var key = this.options.closeKey;
-            switch (key){
+            switch (key) {
                 case 'any':
                     $(window).one('keyup.closeKey', function (e) {
                         if (e.keyCode) {
@@ -241,21 +266,20 @@
         }
         this.isOpen = true;
         //打开后回调onOpen函数
-        this.options.callback.onOpen();
+        this.options.callback.onOpen(this);
     };
     PopVideo.prototype.play = function () {
         this.$video[0].play();
         // 改变播放按钮状态
-        this.$playbtn.attr('data-status','pause');
-
+        this.$playbtn.attr('data-status', 'pause');
+        this.isPlay = true;
+        this.options.callback.onPlay(this);
     }
     PopVideo.prototype.pause = function () {
         this.$video[0].pause();
-        this.$playbtn.attr('data-status','play');
-    };
-    // todo replay
-    PopVideo.prototype.replay = function () {
-
+        this.$playbtn.attr('data-status', 'play');
+        this.isPlay = false;
+        this.options.callback.onPause(this);
     };
     PopVideo.prototype.close = function () {
         $('body').css('overflow', 'auto');
@@ -264,19 +288,47 @@
             this.pause();
         }
         this.isOpen = false;
+        this.options.callback.onClose(this);
     };
+    // PopVideo.prototype.duration = function () {
+    //     return formatTime(this.$video[0].duration)
+    // };
     PopVideo.prototype.destroy = function () {
         this.$body.remove(this.$wrapper);
     };
-    PopVideo.prototype.update = function () {
-        //todo 更新进度条
+    PopVideo.prototype.getCurrentTime = function () {
+        return this.$video[0].currentTime
+    };
+    PopVideo.prototype.setCurrentTime = function (time) {
+        this.$video[0].currentTime = time;
+    };
+//声音控制
+    PopVideo.prototype.getVolume = function () {
+        
+    };
+    PopVideo.prototype.setVolume = function (volume) {
+        
     }
     PopVideo.prototype.setVideo = function (video) {
-this.$video.attr('src',video);
-    }
+       this.$video.attr('src', video);
+
+
+    };
 
     // PopVideo PLUGIN DEFINITION
     // ===========================
+    var formatTime = function (length) {
+        if (typeof length !== "number") {
+            return false
+        }
+        var hour = parseInt(length / (60 * 60));
+        hour = hour > 9 ? hour : "0" + hour;
+        var minute = parseInt(length / 60) % 60;
+        minute = minute > 9 ? minute : "0" + minute;
+        var second = parseInt(length % 60);
+        second = second > 9 ? second : "0" + second;
+        return hour === "00" ? minute + ":" + second : hour + ":" + minute + ":" + second;
+    }
 
     function Plugin(option) {
         // return this.each(function () {
