@@ -90,3 +90,13 @@ popvideo.destroy()
 - 点击视频控制播放暂停
 - 视频时间条和声音控制条的鼠标滑动控制
 - 全屏时隐藏控制界面
+
+## Demo
+[在线地址](https://fchengjin.github.io/jquery.popVideo.js/example/index.html),
+或者克隆当前仓。
+```bash
+git clone https://github.com/fchengjin/jquery.popVideo.js
+cd jquery.popVideo.js
+npm install
+gulp default
+```
