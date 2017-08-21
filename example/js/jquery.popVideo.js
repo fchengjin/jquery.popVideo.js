@@ -23,16 +23,15 @@
         playOnOpen: false,
         closeOnEnd: false,
         pauseOnClose: true,
-        loop: false,
         closeKey: 'esc', //(String || Boolean) 可选值 any，false,esc。其他值默认为esc
         title: '',
         video: '',//(String || Array)
         duration: 300,
         callback: {
-            onOpen: function () {
+            onOpen: function (self) {
                 //窗口打开时
             },
-            onClose: function () {
+            onClose: function (self) {
                 //窗口关闭时
             },
             onPlay: function (self) {
@@ -196,12 +195,12 @@
             self.$control.find('.popvideo_time_duration').html(formatTime(duration));
         });
         //音量改变时
-        this.$video.on('volumechange',function (e) {
+        this.$video.on('volumechange', function (e) {
             var volume = self.volume = this.volume * 100;
-            if(volume < 1){
-                self.$control.find('.popvideo_btn_volume').attr('data-status','mute');
-            }else{
-                self.$control.find('.popvideo_btn_volume').attr('data-status','normal');
+            if (volume < 1) {
+                self.$control.find('.popvideo_btn_volume').attr('data-status', 'mute');
+            } else {
+                self.$control.find('.popvideo_btn_volume').attr('data-status', 'normal');
             }
             self.$control.find('.popvideo_volume_range_current').css('width', volume + "%");
             self.$control.find('.popvideo_volume_handle').css('left', volume + "%");
@@ -240,37 +239,38 @@
         //声音控制界面点击事件
         this.$control.find('.popvideo_volume_range').click(function (e) {
             e.preventDefault();
-            if(e.target === $(this).find('.popvideo_volume_handle')[0]){
+            if (e.target === $(this).find('.popvideo_volume_handle')[0]) {
                 return false;
             }
             var volume = ~~(e.offsetX / $(this).width() * 100);
             self.setVolume(volume);
         });
-this.$control.find('.popvideo_btn_volume').click(function (e) {
-    if(e.target === $(this).find('.popvideo_icon_volume')[0]){
-        switch($(this).attr('data-status')){
-            case "mute":
-                self.setVolume(50);
-                break;
-            case "normal":
-                self.setVolume(0);
-                break;
-            default:
-                break;
-        }
-    }
-})
+        this.$control.find('.popvideo_btn_volume').click(function (e) {
+            if (e.target === $(this).find('.popvideo_icon_volume')[0]) {
+                switch ($(this).attr('data-status')) {
+                    case "mute":
+                        self.setVolume(50);
+                        break;
+                    case "normal":
+                        self.setVolume(0);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        })
         //全屏
         this.$control.find('.popvideo_btn_fullscreen').click(function () {
-switch ($(this).attr('data-status')){
-    case "false":
-        self.fullScreen();
-        break;
-    case "true":
-        self.exitFullScreen();
-        break;
-    default: break;
-}
+            switch ($(this).attr('data-status')) {
+                case "false":
+                    self.fullScreen();
+                    break;
+                case "true":
+                    self.exitFullScreen();
+                    break;
+                default:
+                    break;
+            }
         })
     };
     PopVideo.prototype.open = function () {
@@ -298,6 +298,8 @@ switch ($(this).attr('data-status')){
                             self.close();
                         }
                     });
+                    break;
+                case false:
                     break;
                 default:
                     $(window).one('keyup.closeKey', function (e) {
@@ -346,21 +348,24 @@ switch ($(this).attr('data-status')){
     };
 // 声音控制
     PopVideo.prototype.getVolume = function () {
-return Math.round(this.$video[0].volume * 100);
+        return Math.round(this.$video[0].volume * 100);
     };
     PopVideo.prototype.setVolume = function (volume) {
- this.$video[0].volume = volume/100 < 0.06 ? 0 : (volume/100 > 0.94 ? 1 : volume/100);
+        this.$video[0].volume = volume / 100 < 0.06 ? 0 : (volume / 100 > 0.94 ? 1 : volume / 100);
     }
     PopVideo.prototype.fullScreen = function () {
         requestFullScreen(this.$wrapper.find('.popvideo')[0])
-        this.$control.find('.popvideo_btn_fullscreen').attr('data-status','true')
+        this.$control.find('.popvideo_btn_fullscreen').attr('data-status', 'true')
         this.$wrapper.find('.popvideo').addClass('popvideo-fullscreen')
 
     }
     PopVideo.prototype.exitFullScreen = function () {
-        this.$control.find('.popvideo_btn_fullscreen').attr('data-status','false');
+        this.$control.find('.popvideo_btn_fullscreen').attr('data-status', 'false');
         this.$wrapper.find('.popvideo').removeClass('popvideo-fullscreen')
         exitFull();
+    }
+    PopVideo.prototype.getVideo = function () {
+        return this.$video[0].currentSrc;
     }
     PopVideo.prototype.setVideo = function (video) {
         this.$video.attr('src', video);

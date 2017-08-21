@@ -332,10 +332,6 @@
         transform-origin: center center
     }
 }
-//进度条动画控制
-//.popvideo_progress_load,.popvideo_progress_play,.popvideo_btn_scrubber{
-//    transition: all .1s ease;
-//}
 //全屏播放
 .popvideo.popvideo-fullscreen{
     width: 100%;
@@ -353,9 +349,9 @@
     }
 }
 //以下删除
-.popvideo-head{
-    top: 0;
-}
-.popvideo-control-wrap{
-    bottom: 0;
-}
+//.popvideo-head{
+//    top: 0;
+//}
+//.popvideo-control-wrap{
+//    bottom: 0;
+//}
