@@ -61,13 +61,12 @@
         } else {
             this.video = video;
         }
-        var loop = this.options.loop ? 'loop' : '';
         //生成一个随机5位数，作为id
         var popid = 'popid-'
         do popid += ~~(Math.random() * 100000)
         while (document.getElementById(popid))
         this.popid = popid
-        //TODO 自定义控制界面
+        //自定义控制界面
         var control = " <svg class=\"popvideo_svg_sprite\" display=\"none\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">\n" +
             "            <symbol id=\"popvideo_svg_play\" viewBox=\"0 0 36 36\">\n" +
             "                <path d=\"M25.8 18c0 .6-.3 1.1-.8 1.3L12.5 27c-.2.1-.5.2-.8.2-.8 0-1.5-.6-1.5-1.5V10c0-.8.7-1.5 1.5-1.5.3 0 .5.1.8.2l12.7 7.9c.4.5.6.9.6 1.4z\"></path>\n" +
@@ -124,8 +123,7 @@
             "                <div class=\"popvideo_right_controls\" data-role=\"popvideo-control-right\">\n" +
             "                    <div class=\"popvideo_btn popvideo_btn_volume\" data-role=\"popvideo-control-volume-button\"\n" +
             "                         data-status=\"normal\">\n" +
-            "                        <svg data-role=\"popvideo-control-volume-click-button\" data-report=\"mute-toggle\"\n" +
-            "                             class=\"popvideo_icon popvideo_icon_volume\" version=\"1.1\" viewBox=\"0 0 24 24\">\n" +
+            "                        <svg class=\"popvideo_icon popvideo_icon_volume\" version=\"1.1\" viewBox=\"0 0 24 24\">\n" +
             "                            <use class=\"popvideo_svg_symbol popvideo_svg_volume\"\n" +
             "                                 xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n" +
             "                                 xlink:href=\"#popvideo_svg_volume\"></use>\n" +
@@ -157,7 +155,7 @@
         var tpl = '<div class="popvideo-wrapper" id="' + popid + '">' +
             '<div class="popvideo">' +
             '<div class="popvideo-head"><a href="javascript:void(0)" class="popvideo-close">&times;</a><h4 class="popvideo-title">' + this.options.title + '</h4></div>' +
-            '<div class="popvideo-content">' + '<video></video></div>' +
+            '<div class="popvideo-content">' + '<video webkit-playsinline="true"></video></div>' +
             control +
             '</div></div>';
         $('body').append(tpl);
@@ -169,7 +167,7 @@
         // 为x添加close事件
         var self = this;
         this.$wrapper.click(function (e) {
-            if(e.target === this){
+            if (e.target === this) {
                 self.close();
             }
         });
@@ -185,7 +183,7 @@
             }
         });
         // 视频播放时间改变时
-        this.$video.on('timeupdate',function () {
+        this.$video.on('timeupdate', function () {
             self.$control.find('.popvideo_time_current').html(formatTime(self.getCurrentTime()));
             // 更新进度条
             var percentage = self.getCurrentTime() / self.duration * 100 + "%";
@@ -193,9 +191,20 @@
             self.$control.find('.popvideo_btn_scrubber').css('left', percentage);
         });
         //当元数据（比如分辨率和时长）被加载时运行的脚本。
-        this.$video.on('loadedmetadata',function (e) {
+        this.$video.on('loadedmetadata', function (e) {
             var duration = self.duration = this.duration;
-           self.$control.find('.popvideo_time_duration').html(formatTime(duration));
+            self.$control.find('.popvideo_time_duration').html(formatTime(duration));
+        });
+        //音量改变时
+        this.$video.on('volumechange',function (e) {
+            var volume = self.volume = this.volume * 100;
+            if(volume < 1){
+                self.$control.find('.popvideo_btn_volume').attr('data-status','mute');
+            }else{
+                self.$control.find('.popvideo_btn_volume').attr('data-status','normal');
+            }
+            self.$control.find('.popvideo_volume_range_current').css('width', volume + "%");
+            self.$control.find('.popvideo_volume_handle').css('left', volume + "%");
         });
         //播放按钮事件
         this.$playbtn.on('click.popvideo.play', function () {
@@ -213,20 +222,55 @@
             }
         })
         //空格控制播放
-        $(window).on('keyup.space',function (e) {
-           if(e.keyCode === 32 && self.isOpen){
-               if(self.isPlay){
-                   self.pause();
-               }else{
-                   self.play();
-               }
-           }
+        $(window).on('keyup.space', function (e) {
+            if (e.keyCode === 32 && self.isOpen) {
+                if (self.isPlay) {
+                    self.pause();
+                } else {
+                    self.play();
+                }
+            }
         });
         //进度条点击事件
-        this.$control.find('.popvideo_progress_bar_container').on('click.progress',function (e) {
+        this.$control.find('.popvideo_progress_bar_container').on('click.progress', function (e) {
             e.preventDefault();
             var p = parseInt(self.duration * e.offsetX / $(this).width());
             self.setCurrentTime(p);
+        });
+        //声音控制界面点击事件
+        this.$control.find('.popvideo_volume_range').click(function (e) {
+            e.preventDefault();
+            if(e.target === $(this).find('.popvideo_volume_handle')[0]){
+                return false;
+            }
+            var volume = ~~(e.offsetX / $(this).width() * 100);
+            self.setVolume(volume);
+        });
+this.$control.find('.popvideo_btn_volume').click(function (e) {
+    if(e.target === $(this).find('.popvideo_icon_volume')[0]){
+        switch($(this).attr('data-status')){
+            case "mute":
+                self.setVolume(50);
+                break;
+            case "normal":
+                self.setVolume(0);
+                break;
+            default:
+                break;
+        }
+    }
+})
+        //全屏
+        this.$control.find('.popvideo_btn_fullscreen').click(function () {
+switch ($(this).attr('data-status')){
+    case "false":
+        self.fullScreen();
+        break;
+    case "true":
+        self.exitFullScreen();
+        break;
+    default: break;
+}
         })
     };
     PopVideo.prototype.open = function () {
@@ -290,9 +334,6 @@
         this.isOpen = false;
         this.options.callback.onClose(this);
     };
-    // PopVideo.prototype.duration = function () {
-    //     return formatTime(this.$video[0].duration)
-    // };
     PopVideo.prototype.destroy = function () {
         this.$body.remove(this.$wrapper);
     };
@@ -300,19 +341,29 @@
         return this.$video[0].currentTime
     };
     PopVideo.prototype.setCurrentTime = function (time) {
+        // todo 添加缓冲页面
         this.$video[0].currentTime = time;
     };
-//声音控制
+// 声音控制
     PopVideo.prototype.getVolume = function () {
-        
+return Math.round(this.$video[0].volume * 100);
     };
     PopVideo.prototype.setVolume = function (volume) {
-        
+ this.$video[0].volume = volume/100 < 0.06 ? 0 : (volume/100 > 0.94 ? 1 : volume/100);
+    }
+    PopVideo.prototype.fullScreen = function () {
+        requestFullScreen(this.$wrapper.find('.popvideo')[0])
+        this.$control.find('.popvideo_btn_fullscreen').attr('data-status','true')
+        this.$wrapper.find('.popvideo').addClass('popvideo-fullscreen')
+
+    }
+    PopVideo.prototype.exitFullScreen = function () {
+        this.$control.find('.popvideo_btn_fullscreen').attr('data-status','false');
+        this.$wrapper.find('.popvideo').removeClass('popvideo-fullscreen')
+        exitFull();
     }
     PopVideo.prototype.setVideo = function (video) {
-       this.$video.attr('src', video);
-
-
+        this.$video.attr('src', video);
     };
 
     // PopVideo PLUGIN DEFINITION
@@ -342,6 +393,41 @@
         if (!data) $this.data('PopVideo', (data = new PopVideo(this, option)))
         if (typeof option === 'string') data[option]()
         return data;
+    }
+
+    function requestFullScreen(element) {
+        // 判断各种浏览器，找到正确的方法
+        var requestMethod = element.requestFullScreen || //W3C
+            element.webkitRequestFullScreen ||    //Chrome等
+            element.mozRequestFullScreen || //FireFox
+            element.msRequestFullScreen; //IE11
+        if (requestMethod) {
+            requestMethod.call(element);
+        }
+        else if (typeof window.ActiveXObject !== "undefined") {//for Internet Explorer
+            var wscript = new ActiveXObject("WScript.Shell");
+            if (wscript !== null) {
+                wscript.SendKeys("{F11}");
+            }
+        }
+    }
+
+    //退出全屏 判断浏览器种类
+    function exitFull() {
+        // 判断各种浏览器，找到正确的方法
+        var exitMethod = document.exitFullscreen || //W3C
+            document.mozCancelFullScreen ||    //Chrome等
+            document.webkitExitFullscreen || //FireFox
+            document.webkitExitFullscreen; //IE11
+        if (exitMethod) {
+            exitMethod.call(document);
+        }
+        else if (typeof window.ActiveXObject !== "undefined") {//for Internet Explorer
+            var wscript = new ActiveXObject("WScript.Shell");
+            if (wscript !== null) {
+                wscript.SendKeys("{F11}");
+            }
+        }
     }
 
     var old = $.fn.popVideo

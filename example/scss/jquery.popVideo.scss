@@ -121,6 +121,7 @@
     margin-left: -15px;
     top: -10px;
     cursor: pointer;
+    pointer-events: none;
 }
 .popvideo_scrubber_indicator{
     position: relative;
@@ -305,6 +306,9 @@
     border-radius: 5px;
     top: -3px;
     margin-left: -5px;
+    &:hover{
+        box-shadow: 0 0 4px 4px #ff6e0b;
+    }
 }
 @keyframes popvideo_btn_rotate {
     0% {
@@ -328,11 +332,26 @@
         transform-origin: center center
     }
 }
-进度条动画控制
-.popvideo_progress_load,.popvideo_progress_play,.popvideo_btn_scrubber{
-    transition: all .1s ease;
+//进度条动画控制
+//.popvideo_progress_load,.popvideo_progress_play,.popvideo_btn_scrubber{
+//    transition: all .1s ease;
+//}
+//全屏播放
+.popvideo.popvideo-fullscreen{
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    background: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .popvideo-content video{
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
+    }
 }
-
 //以下删除
 .popvideo-head{
     top: 0;

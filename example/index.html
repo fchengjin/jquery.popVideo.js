@@ -18,7 +18,7 @@
 </head>
 <body>
 <!--https://c1.mifile.cn/f/i/17/mi6/index/video-footer.mp4-->
-<video src="/media/video.mp4"
+<video src="/media/video.mp4" webkit-playsinline playsinline x5-video-player-type="h5"
        loop muted autoplay id="video" class="video" style="width: 300px">
     <source src="/media/video.mp4" type="video/mp4">
 </video>
@@ -33,6 +33,7 @@
 //            closeOnEnd: true,
             pauseOnClose: true,
             video: "media/popvideo.mp4"
+//            video:'https://c1.mifile.cn/f/i/17/mi6/index/video-footer.mp4'
         }).open()
     });
 </script>
