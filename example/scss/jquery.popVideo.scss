@@ -341,11 +341,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    .popvideo-content video{
+    .popvideo-content{
         width: 100%;
         height: 100%;
-        object-fit: contain;
-        display: block;
+        video{
+            width: 100%;
+            object-fit: contain;
+            display: block;
+        }
     }
 }
 //以下删除

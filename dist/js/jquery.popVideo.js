@@ -337,7 +337,7 @@
         this.options.callback.onClose(this);
     };
     PopVideo.prototype.destroy = function () {
-        this.$body.remove(this.$wrapper);
+        this.$wrapper.remove();
     };
     PopVideo.prototype.getCurrentTime = function () {
         return this.$video[0].currentTime
